@@ -1,0 +1,101 @@
+---
+title: "QMM"
+author: "Neetu"
+date: "2024-09-07"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Back Savers Company
+```{r}
+## Define the data for Collegiate and Mini backpacks
+data <- matrix(c(3, 45, 32, 2, 40, 24), ncol = 3, byrow = TRUE)
+colnames(data) <- c("Material (sq ft)", "Labor (min)", "Profit ($)")
+rownames(data) <- c("Collegiate", "Mini")
+data_table <- as.table(data)
+data_table
+
+## Summary of the LP model
+decision_vars <- c("x_C: Collegiate", "x_M: Mini")
+objective_function <- "Maximize Z = 32x_C + 24x_M"
+constraints <- c("3x_C + 2x_M <= 5000", "45x_C + 40x_M <= 84000", "x_C <= 1000", "x_M <= 1200", "x_C >= 0", "x_M >= 0")
+
+# Print the summaries
+decision_vars
+objective_function
+constraints
+```
+###Summary
+a) Decision Variables: Let xC be the number of Collegiate backpacks produced, and xM be the number of Mini backpacks produced.
+
+b) Objective Function: Maximize the profit: Z=32xC+24xM
+
+c) Constraints:
+•	Material Constraint:3x_C + 2x_M \leq 5000
+•	Labor Constraint:Total labor available = 35 workers * 40 hours = 1400 hours = 84000 minutes
+Therefore, the labor constraint should be:
+45x_C + 40x_M \leq 84000
+•	Sales Constraints:( x_C \leq 1000 ), ( x_M \leq 1200 )
+ 
+
+d) Full Mathematical Formulation:
+Maximize: Z=32xC+24xM
+Subject to: ( 3x_C + 2x_M \leq 5000 )
+            ( 45x_C + 40x_M \leq 84000 )
+            ( x_C \leq 1000 )
+            ( x_M \leq 1200 )
+            
+Non-negativity: x_C \geq 0, \quad x_M \geq 0
+
+##Weigelt Corporation
+```{r}
+# Define the data for plants and product sizes
+data_weigelt <- matrix(c(20, 15, 12, # Storage required per unit (sq ft)
+                        13000, 12000, 5000, # Storage available at each plant (sq ft)
+                        750, 900, 450), # Production capacity at each plant (units)
+                        nrow = 4, byrow = TRUE)
+
+# Assign row and column names
+colnames(data_weigelt) <- c("Large", "Medium", "Small")
+rownames(data_weigelt) <- c("Storage per Unit (sq ft)", "Plant 1 Capacity", "Plant 2 Capacity", "Plant 3 Capacity")
+
+# Convert matrix to table format
+data_table_weigelt <- as.table(data_weigelt)
+data_table_weigelt
+```
+
+
+###Summary
+a) Decision Variables: Let:
+1. (X_{L1}, X_{M1}, X_{S1}): number of large, medium, and small units produced at Plant 1.
+2. (X_{L2}, X_{M2}, X_{S2}): number of large, medium, and small units produced at Plant 2.
+3. (X_{L3}, X_{M3}, X_{S3}): number of large, medium, and small units produced at Plant 3.
+
+b) Linear Programming Model:
+Maximize profit:
+P = 420(X_{L1} + X_{L2} + X_{L3}) + 360(X_{M1} + X_{M2} + X_{M3}) + 300(X_{S1} + X_{S2} + X_{S3})
+
+Constraints:
+1. Capacity Constraints:
+Plant 1: X_{L1} + X_{M1} + X_{S1} \leq 750
+Plant 2:X_{L2} + X_{M2} + X_{S2} \leq 900
+Plant 3: X_{L3} + X_{M3} + X_{S3} \leq 450
+
+2. Storage Constraints:
+Plant 1:20X_{L1} + 15X_{M1} + 12X_{S1} \leq 13000
+Plant 2: 20X_{L2} + 15X_{M2} + 12X_{S2} \leq 12000
+Plant 3: 20X_{L3} + 15X_{M3} + 12X_{S3} \leq 5000
+
+3. Sales Constraints:
+Total large units: X_{L1} + X_{L2} + X_{L3} \leq 900
+Total medium units: X_{M1} + X_{M2} + X_{M3} \leq 1200
+Total small units: X_{S1} + X_{S2} + X_{S3} \leq 750
+
+4. Non-negativity Constraints:
+X_{L1}, X_{M1}, X_{S1}, X_{L2}, X_{M2}, X_{S2}, X_{L3}, X_{M3}, X_{S3} \geq 0
+
