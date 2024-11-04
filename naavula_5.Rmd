@@ -1,0 +1,116 @@
+---
+title: "QMM 5"
+author: "Neetu"
+date: "2024-11-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Load necessary libraries
+library(lpSolveAPI)
+library(kableExtra)
+```
+```{r}
+# Create a data frame to summarize factors and goals
+df = data.frame(
+  Factor = c("Total Profit", "Employment Level", "Next Year's Earnings"),
+  "Product 1" = c(20, 6, 8),
+  "Product 2" = c(15, 4, 7),
+  "Product 3" = c(25, 5, 5),
+  Goal = c("Maximize", "= 50", ">= 75")
+)
+
+# Display the data frame
+df %>%
+  kable(align = "c") %>%
+  kable_classic() %>%
+  add_header_above(header = c(" " = 1, "Product" = 3, " " = 1)) %>%
+  add_header_above(header = c(" " = 1, "Unit Contribution" = 3, " " = 1)) %>%
+  column_spec(1, border_right = TRUE) %>%
+  column_spec(4, border_right = TRUE) %>%
+  column_spec(5, border_right = TRUE)
+```
+
+##Question 1: Formulate Constraints
+The production rates of the first, second, and third products are denoted as x1x_1x1, x2x_2x2, and x3x_3x3, respectively. The constraints can be expressed as follows:
+•	Employment constraint: 6x1+4x2+5x3≤50
+•	Earnings constraint: 8x1+7x2+5x3≥75 
+
+We can write these constraints in deviation form:
+•	For employment: y1=6x1+4x2+5x3−50 
+•	For earnings: y2=75−(8x1+7x2+5x3) 
+
+Where y1y is the positive deviation (excess employment) and y2y is the negative deviation (shortfall in earnings).
+
+
+##Question 2: Define the Objective Function
+The objective is to maximize total profit while maintaining workforce stability and ensuring minimum earnings. The objective function can be expressed as:
+Maximize Z=20x1+15x2+25x3−5(y1++y1−)−2y2−
+
+Subject to the constraints:
+•	Employment: 6x1+4x2+5x3−y1++y1−=50 
+•	Earnings: 8x1+7x2+5x3−y2++y2−=75 
+
+Non-negativity of decision variables: x1,x2,x3,y1+,y1−,y2+,y2−≥0 
+
+
+##Question 3: Implementing the LP Problem in R
+```{r}
+# Create the LP model
+lprec = make.lp(2, 7)
+
+# Set the objective function coefficients
+set.objfn(lprec, c(20, 15, 25, -5, 5, 0, -2))
+lp.control(lprec, sense = 'max')
+
+# Add constraints
+set.row(lprec, 1, c(6, 4, 5, 1, 0, 0, 0), indices = c(1, 2, 3, 4, 5, 6, 7))
+set.row(lprec, 2, c(8, 7, 5, 0, 0, -1, 1), indices = c(1, 2, 3, 4, 5, 6, 7))
+
+# Define right-hand side values
+rhs = c(50, 75)
+set.rhs(lprec, rhs)
+
+# Set constraint types
+set.constr.type(lprec, c("=", ">="))
+
+# Solve the LP problem
+solve(lprec)
+```
+
+
+#Results and findings
+```{r}
+# Retrieve the optimal objective value and decision variable values
+optimal_value <- get.objective(lprec)
+decision_vars <- get.variables(lprec)
+
+cat("Optimal objective value:", optimal_value, "\n")
+cat("Optimal production levels:\n")
+cat("Product 1 (x1):", decision_vars[1], "\n")
+cat("Product 2 (x2):", decision_vars[2], "\n")
+cat("Product 3 (x3):", decision_vars[3], "\n")
+cat("y1+ (Excess Employment):", decision_vars[4], "\n")
+cat("y1- (Shortfall Employment):", decision_vars[5], "\n")
+cat("y2+ (Excess Earnings):", decision_vars[6], "\n")
+cat("y2- (Shortfall Earnings):", decision_vars[7], "\n")
+```
+
+##Conclusion
+The LP problem was successfully formulated and solved using the specified constraints and objective function. The optimal objective value is 275, indicating the maximum profit achievable under the given constraints.
+
+The optimal production levels are as follows:
+•	Product 1 (x1): 0
+•	Product 2 (x2): 0
+•	Product 3 (x3): 15
+•	Excess Employment (y1+): 5
+•	Shortfall Employment (y1-): 0
+•	Excess Earnings (y2+): 0
+•	Shortfall Earnings (y2-): 0
+
+These findings suggest that production should focus solely on Product 3 to achieve the maximum profit while maintaining the required employment and earnings levels. The positive deviation in employment indicates that there is some flexibility in workforce management without compromising profit.
+
